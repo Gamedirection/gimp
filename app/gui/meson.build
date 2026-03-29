@@ -1,14 +1,5 @@
-
-gimpdbusservice_gen = gnome.gdbus_codegen(
-  'gimpdbusservice-generated',
-  'dbus-service.xml',
-  interface_prefix: 'org.gimp.GIMP.',
-  namespace: 'GimpDBusService',
-)
-
 libappgui_sources = [
   'gimpapp.c',
-  'gimpdbusservice.c',
   'gimpuiconfigurer.c',
   'gui-message.c',
   'gui-unique.c',
@@ -19,7 +10,6 @@ libappgui_sources = [
   'session.c',
   'splash.c',
   'themes.c',
-  gimpdbusservice_gen,
 ]
 
 # Workaround for generated header included in other directories.

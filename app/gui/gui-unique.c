@@ -45,7 +45,6 @@
 
 #include "widgets/gimpuimanager.h"
 
-#include "gimpdbusservice.h"
 #include "gui-unique.h"
 #include "themes.h"
 
@@ -81,9 +80,6 @@ static void                  (^themeChangeHandler) (NSNotification *) = NULL;
 
 static void  gui_dbus_service_init (Gimp *gimp);
 static void  gui_dbus_service_exit (void);
-
-static GDBusObjectManagerServer *dbus_manager = NULL;
-static guint                     dbus_name_id = 0;
 
 #endif
 
@@ -438,69 +434,14 @@ gui_unique_quartz_trigger_quit (gpointer data)
 #else
 
 static void
-gui_dbus_bus_acquired (GDBusConnection *connection,
-                       const gchar     *name,
-                       Gimp            *gimp)
-{
-  GDBusObjectSkeleton *object;
-  GObject             *service;
-
-  /* this should use GIMP_DBUS_SERVICE_PATH, but that's historically wrong */
-  dbus_manager = g_dbus_object_manager_server_new ("/org/gimp/GIMP");
-
-  object = g_dbus_object_skeleton_new (GIMP_DBUS_INTERFACE_PATH);
-
-  service = gimp_dbus_service_new (gimp);
-  g_dbus_object_skeleton_add_interface (object,
-                                        G_DBUS_INTERFACE_SKELETON (service));
-  g_object_unref (service);
-
-  g_dbus_object_manager_server_export (dbus_manager, object);
-  g_object_unref (object);
-
-  g_dbus_object_manager_server_set_connection (dbus_manager, connection);
-}
-
-static void
-gui_dbus_name_acquired (GDBusConnection *connection,
-                        const gchar     *name,
-                        Gimp            *gimp)
-{
-}
-
-static void
-gui_dbus_name_lost (GDBusConnection *connection,
-                    const gchar     *name,
-                    Gimp            *gimp)
-{
-  if (connection == NULL)
-    g_printerr ("%s: connection to the bus cannot be established.\n",
-                G_STRFUNC);
-  else
-    g_printerr ("%s: the name \"%s\" could not be acquired on the bus.\n",
-                G_STRFUNC, name);
-}
-
-static void
 gui_dbus_service_init (Gimp *gimp)
 {
   g_return_if_fail (GIMP_IS_GIMP (gimp));
-  g_return_if_fail (dbus_name_id == 0);
-
-  dbus_name_id = g_bus_own_name (G_BUS_TYPE_SESSION,
-                                 GIMP_DBUS_SERVICE_NAME,
-                                 G_BUS_NAME_OWNER_FLAGS_NONE,
-                                 (GBusAcquiredCallback) gui_dbus_bus_acquired,
-                                 (GBusNameAcquiredCallback) gui_dbus_name_acquired,
-                                 (GBusNameLostCallback) gui_dbus_name_lost,
-                                 gimp, NULL);
 }
 
 static void
 gui_dbus_service_exit (void)
 {
-  g_bus_unown_name (dbus_name_id);
-  g_clear_object (&dbus_manager);
 }
 
 #endif

@@ -17,10 +17,15 @@ stamp_core_enums = custom_target('stamp-core-enums.h',
   build_by_default: true
 )
 
-appcoremarshal = gnome.genmarshal('gimpmarshal',
-  prefix: 'gimp_marshal',
-  sources: 'gimpmarshal.list',
-  install_header: false,
+appcoremarshal = custom_target('gimpmarshal',
+  input : 'gimpmarshal.list',
+  output: [ 'gimpmarshal.c', 'gimpmarshal.h' ],
+  command: [
+    genmarshal_py,
+    '--prefix', 'gimp_marshal',
+    '--basename', 'gimpmarshal',
+    '@INPUT@', '@OUTPUT0@', '@OUTPUT1@'
+  ],
 )
 
 libappcore_sources = [

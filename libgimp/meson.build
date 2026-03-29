@@ -52,10 +52,15 @@ gimpenums = custom_target('gimpenums.c',
   capture: true,
 )
 
-gimpuimarshal = gnome.genmarshal('gimpuimarshal',
-  prefix: '_gimpui_marshal',
-  sources: 'gimpuimarshal.list',
-  install_header: false,
+gimpuimarshal = custom_target('gimpuimarshal',
+  input : 'gimpuimarshal.list',
+  output: [ 'gimpuimarshal.c', 'gimpuimarshal.h' ],
+  command: [
+    genmarshal_py,
+    '--prefix', '_gimpui_marshal',
+    '--basename', 'gimpuimarshal',
+    '@INPUT@', '@OUTPUT0@', '@OUTPUT1@'
+  ],
 )
 
 pdb_wrappers_sources = [
@@ -521,6 +526,14 @@ elif get_option('b_sanitize') != 'none'
   gobject_introspection_warning = '\n      '.join(['',
     'GObject Introspection is disabled while building with a sanitizer.',
     'See: https://gitlab.gnome.org/GNOME/gobject-introspection/-/issues/375'
+  ])
+  warning(gobject_introspection_warning)
+  warnings += gobject_introspection_warning
+elif not g_ir_compiler.found()
+  have_gobject_introspection = false
+  gobject_introspection_warning = '\n      '.join(['',
+    'GObject Introspection is disabled because g-ir-compiler was not found.',
+    'Install gobject-introspection to generate typelib artifacts.'
   ])
   warning(gobject_introspection_warning)
   warnings += gobject_introspection_warning

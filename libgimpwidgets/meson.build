@@ -18,10 +18,15 @@ stamp_widgets_enums = custom_target('stamp-gimpwidgetsenums.h',
   build_by_default: true
 )
 
-gimpwidgetsmarshal = gnome.genmarshal('gimpwidgetsmarshal',
-  prefix: '_gimp_widgets_marshal',
-  sources: 'gimpwidgetsmarshal.list',
-  install_header: false,
+gimpwidgetsmarshal = custom_target('gimpwidgetsmarshal',
+  input : 'gimpwidgetsmarshal.list',
+  output: [ 'gimpwidgetsmarshal.c', 'gimpwidgetsmarshal.h' ],
+  command: [
+    genmarshal_py,
+    '--prefix', '_gimp_widgets_marshal',
+    '--basename', 'gimpwidgetsmarshal',
+    '@INPUT@', '@OUTPUT0@', '@OUTPUT1@'
+  ],
 )
 
 libgimpwidgets_sources_introspectable = files(

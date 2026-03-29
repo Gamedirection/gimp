@@ -43,7 +43,6 @@ libapp_sources = [
   'signals.c',
   'unique.c',
   gitversion_h,
-  gimpdbusservice_gen,
 ]
 
 if platform_windows

@@ -1336,12 +1336,13 @@ endif
 xmllint             = find_program('xmllint', required: false)
 xsltproc            = find_program('xsltproc')
 desktop_validate    = find_program('desktop-file-validate', required: false)
+genmarshal_py       = find_program('tools/genmarshal.py')
 
 appstreamcli = find_program('appstreamcli', version: '>=0.15.3', required: get_option('appdata-test'))
 
 # Check for .typelib generation tools
 
-g_ir_compiler = find_program('g-ir-compiler')
+g_ir_compiler = find_program('g-ir-compiler', required: false)
 
 # Check for doc generation tools
 
